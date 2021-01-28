@@ -1,0 +1,100 @@
+model {
+  for (i in 1:n.spp) {
+    # state processes
+    for(j in 1:n.point_year) {
+      Y[j, i] ~ dbinom(p[j, i]*u[j, i], TPeriod[j, i])
+      u[j, i] ~ dbern(theta[j, i]*z[gridID[j], i, yearID[j]])
+      logit(theta[j, i]) <- alpha0[i] + inprod(alpha1[i, 1:p.alpha], X.alpha[j, 1:p.alpha])
+      logit(p[j, i]) <- zeta0[i] + inprod(zeta1[i, 1:p.zeta], X.zeta[j, 1:p.zeta])
+    }
+    
+    for(k in 1:n.grid) {
+      for(t in 1:n.year) {
+        z[k, i, t] ~ dbern(psi[k, i, t]*w[i])
+        logit(psi[k, i, t]) <- beta0[i] + dev.b0[i, t] + inprod(beta1[i, 1:p.beta], X.beta[k, t, 1:p.beta])
+      }
+    }
+
+    zeta0[i] ~ dnorm(zeta0.mu + (rho.za*sigma.zeta0 / sigma.alpha0) * (alpha0[i] - alpha0.mu),
+      pow(sigma.zeta0, -2)/(1 - pow(rho.za, 2)))
+    alpha0[i] ~ dnorm(alpha0.mu + (rho.ab*sigma.alpha0 / sigma.beta0) * (beta0[i] - beta0.mu),
+      pow(sigma.alpha0, -2) / (1 - pow(rho.ab, 2)))
+    beta0[i] ~ dnorm(beta0.mu, pow(sigma.beta0, -2))
+    
+    for(t in 1:n.year) { # yearly deviations from the mean
+      dev.b0[i, t] ~ dnorm(0, pow(sigma.b0, -2)) # Year-specific deviations in grid occupancy from mean for each species
+    }
+
+    # covariates relationships
+    for(b in 1:p.zeta) {
+      zeta1[i, b] ~ dnorm(zeta1.mu[b], pow(sigma.zeta1[b], -2))
+    }
+
+    for(b in 1:p.alpha) {
+      alpha1[i, b] ~ dnorm(alpha1.mu[b], pow(sigma.alpha1[b], -2))
+    }
+
+    for(b in 1:p.beta) {
+      beta1[i, b] ~ dnorm(beta1.mu[b], pow(sigma.beta1[b], -2))
+    }
+
+    w[i] ~ dbern(omega)
+  }
+  
+  ### Derive species richness (Don't think this is necessary for mapping restoration benefits. Will just use predicted richness.) ###
+  #for(j in 1:n.point_year) {
+  #  SR_point[j] <- sum(u[j,])
+  #}
+  
+  ### prior distributions ###
+  
+  # parameter correlations
+  
+  rho.za ~ dunif(-1,1) # Correlation between detectability and point occupancy
+  rho.ab ~ dunif(-1,1) # Correlation between point and grid occupancy
+  
+  # mean and precison for the parameter intercepts
+  
+  zeta0.mu ~  dt(0, pow(t.sigma, -2), t.nu) # logit detection probability intercept
+  tvar.sigma.zeta0 ~ dt(0,1,1)  # Cauchy distribution
+  sigma.zeta0 <- abs(tvar.sigma.zeta0)  # half-Cauchy distribution
+
+  alpha0.mu ~  dt(0, pow(t.sigma, -2), t.nu) # logit point occupancy intercept
+  sigma.alpha0 <- abs(tvar.sigma.alpha0)  # half-Cauchy distribution
+  tvar.sigma.alpha0 ~ dt(0,1,1)  # Cauchy distribution
+
+  beta0.mu ~  dt(0, pow(t.sigma, -2), t.nu) # logit point occupancy intercept
+  sigma.beta0 <- abs(tvar.sigma.beta0)  # half-Cauchy distribution
+  tvar.sigma.beta0 ~ dt(0,1,1)  # Cauchy distribution
+    # Year effect point occupancy hyper-parameters #
+  tvar.sigma.b0 ~ dt(0,1,1)  # Cauchy distribution
+  sigma.b0 <- abs(tvar.sigma.b0)  # half-Cauchy distribution
+
+
+  # metacommunity parameter
+  omega ~ dunif(0,1)
+  
+  # covariates for p (zeta)
+  for(b in 1:p.zeta) {
+    zeta1.mu[b] ~ dt(0, pow(t.sigma, -2), t.nu)
+    sigma.zeta1[b] <- abs(tvar.zeta1[b]) # half-Cauchy distribution
+    tvar.zeta1[b] ~ dt(0,1,1)  # Cauchy distribution
+  }
+
+  # covariates for theta (alpha)
+  for(b in 1:p.alpha) {
+    alpha1.mu[b] ~ dt(0, pow(t.sigma, -2), t.nu)
+    sigma.alpha1[b] <- abs(tvar.alpha1[b]) # half-Cauchy distribution
+    tvar.alpha1[b] ~ dt(0,1,1)  # Cauchy distribution
+  }
+
+  # covariates for psi (beta)
+  for(b in 1:p.beta) {
+    beta1.mu[b] ~ dt(0, pow(t.sigma, -2), t.nu)
+    sigma.beta1[b] <- abs(tvar.beta1[b]) # half-Cauchy distribution
+    tvar.beta1[b] ~ dt(0,1,1)  # Cauchy distribution
+  }
+
+  t.nu <- 7.763179      # Uniform prior
+  t.sigma <- 1.566267   # Uniform prior
+}
