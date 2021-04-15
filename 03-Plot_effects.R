@@ -116,21 +116,6 @@ p.PACC40 <- ggplot(dat = dat.plt.supp, aes(x = index, y = beta.PACC40)) +
   theme(axis.text.y=element_text(size=15)) +
   guides(color = F)
 
-p.PAR40 <- ggplot(dat = dat.plt.supp, aes(x = index, y = beta.mnPerArRatio_Opn)) +
-  geom_errorbar(aes(ymin = beta.mnPerArRatio_Opn.lo, ymax = beta.mnPerArRatio_Opn.hi, color = beta.mnPerArRatio_Opn.supp), size=1, width=0) +
-  geom_point(size = 2.5, aes(color = beta.mnPerArRatio_Opn.supp)) + 
-  geom_hline(yintercept = 0) +
-  coord_flip() +
-  scale_x_continuous(breaks = 1:nrow(dat.plt.supp), labels = rev(dat.plt.supp$Spp), expand=c(0, 1)) +
-  scale_y_continuous(lim = c(min.y, max.y)) +
-  scale_color_manual(values = c("#0072B2", "#000000", "#D55E00")) +
-  ylab(expression(hat(beta)["PAROpn"])) + xlab(NULL) +
-  theme(axis.title.y=element_text(size=30)) +
-  theme(axis.title.x=element_text(size=30)) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.text.y=element_text(size=15)) +
-  guides(color = F)
-
 p.CanCov <- ggplot(dat = dat.plt.supp, aes(x = index, y = alpha.CanCov)) +
   geom_errorbar(aes(ymin = alpha.CanCov.lo, ymax = alpha.CanCov.hi, color = alpha.CanCov.supp), size=1, width=0) +
   geom_point(size = 2.5, aes(color = alpha.CanCov.supp)) + 
@@ -162,11 +147,10 @@ p.CanCov2 <- ggplot(dat = dat.plt.supp, aes(x = index, y = alpha.CanCov2)) +
   guides(color = F)
 
 p <- ggdraw() + 
-  draw_plot(p.PACC10,  x = 0.05, y = 0, width = 0.19, height = 1) +
-  draw_plot(p.PACC40,  x = 0.24, y = 0, width = 0.19, height = 1) +
-  draw_plot(p.PAR40,   x = 0.43, y = 0, width = 0.19, height = 1) +
-  draw_plot(p.CanCov,  x = 0.62, y = 0, width = 0.19, height = 1) +
-  draw_plot(p.CanCov2, x = 0.81, y = 0, width = 0.19, height = 1) +
+  draw_plot(p.PACC10,  x = 0.0500, y = 0, width = 0.2375, height = 1) +
+  draw_plot(p.PACC40,  x = 0.2875, y = 0, width = 0.2375, height = 1) +
+  draw_plot(p.CanCov,  x = 0.5250, y = 0, width = 0.2375, height = 1) +
+  draw_plot(p.CanCov2, x = 0.7625, y = 0, width = 0.2375, height = 1) +
   draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0)
 
-save_plot("Plot_effects.jpg", p, ncol = 5, nrow = 3.5, dpi = 200)
+save_plot("Plot_effects.jpg", p, ncol = 4, nrow = 3.5, dpi = 200)

@@ -2,7 +2,6 @@ library(stringr)
 library(BCRDataAPI)
 library(dplyr)
 
-#setwd("/home/RMBO.LOCAL/quresh.latif/CFLRP")
 setwd("C:/Users/Quresh.Latif/files/projects/CEAP_map_tool")
 
 ################## Inputs ####################
@@ -179,7 +178,7 @@ bird_data <- grab %>%  # Store bird survey data for later use.
 dat.gis <- foreign::read.dbf("C:/Users/Quresh.Latif/files/GIS/FS/CFLRP/Bird_survey_point_coords.dbf", as.is = T) %>%
   tbl_df() %>%
   rename(Grid = TransectNu) %>%
-  select(Grid, Point, Northing, heatload, TWI)
+  select(Grid, Point, Northing, heatload, TWI, LifeZone)
 
 ## Get grid-level landscape structure (LANDFIRE) covariates ##
 landscape_data <- data.frame(Grid = pointXyears.list %>% str_sub(1, -9),
@@ -246,18 +245,25 @@ landscape_data <- landscape_data %>%
                              mnPerArRatio_Opn = para_mn,
                              NNdist_Opn = enn_mn) %>%
                       mutate(NNdist_Opn = NNdist_Opn / 1000) %>%
-                      select(TransNum, mnPtchAr_Opn, NNdist_Opn, mnPerArRatio_Opn)
+                      select(TransNum, mnPtchAr_Opn, NNdist_Opn, mnPerArRatio_Opn),
+                    by = "TransNum"
                   ) %>%
                   mutate(Year = "2018")
               ),
             by = c("Grid" = "TransNum", "Year" = "Year")) %>%
   select(Grid:NNdist_Opn)
 
+Mode <- function(x) { # Define function for getting the most frequent level
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
 dat.gis <- dat.gis %>%
   dplyr::group_by(Grid) %>%
   summarize(Latitude = mean(Northing),
             heatload = mean(heatload),
-            TWI = mean(TWI))
+            TWI = mean(TWI),
+            LifeZone = Mode(LifeZone)) %>%
+  mutate(LowMont = as.integer(LifeZone == "Lower montane"))
 
 landscape_data <- landscape_data %>%
   left_join(dat.gis, by = "Grid")

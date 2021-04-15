@@ -1,5 +1,5 @@
 # Primary data objects
-beta.vars <- c("PACC10", "PACC40", "mnPerArRatio_Opn", "Latitude", "heatload", "TWI")
+beta.vars <- c("PACC10", "PACC40", "mnPerArRatio_Opn", "Latitude", "heatload", "TWI", "LowMont")
 alpha.vars <- c("CanCov")
 alpha.quad <- c(T)
 zeta.vars <- c("CanCov", "DayOfYear", "Time_ssr")

@@ -28,21 +28,25 @@ source(str_c(scripts.loc, "Data_processing_community_occupancy.R"))
 
 # Get covariates for spatial prediction #
 dat_grid <- foreign::read.dbf("C:/Users/Quresh.Latif/files/GIS/CEAP/PredictGrid/Predict_RES_FHR_DoN_USNGv2.dbf", as.is = T) %>%
-  rename(Latitude = CP_X,
+  rename(Latitude = CP_Y,
          percGap_2018 = PGap2018, percGap_RES = PGapRES, percGap_FHR = PGapFHR,
          percOpn_2018 = POpen2018, percOpn_RES = POpenRES, percOpn_FHR = POpenFHR,
          PAROpn_2018 = Open2018PA, PAROpn_RES = OpenRESPAR, PAROpn_FHR = OpenFHRPAR) %>%
   mutate(TWI = ifelse(TWI == -9999, NA, TWI),
          PAROpn_2018 = PAROpn_2018 %>% as.numeric(),
          PAROpn_FHR = PAROpn_FHR %>% as.numeric(),
-         PAROpn_RES = PAROpn_RES %>% as.numeric())
+         PAROpn_RES = PAROpn_RES %>% as.numeric()) %>%
+  mutate(PAROpn_2018 = ifelse(percOpn_2018 == 0, mean(landscape_data$mnPerArRatio_Opn), PAROpn_2018), # Treat PAR as undefined when there is no open forest.
+         PAROpn_FHR = ifelse(percOpn_FHR == 0, mean(landscape_data$mnPerArRatio_Opn), PAROpn_FHR),
+         PAROpn_RES = ifelse(percOpn_RES == 0, mean(landscape_data$mnPerArRatio_Opn), PAROpn_RES))
 dat_point <- foreign::read.dbf("C:/Users/Quresh.Latif/files/GIS/CEAP/PredictGrid/CEAPptsPolyv2.dbf", as.is = T) %>%
   rename(CanCov_2018 = CC_Nothing, CanCov_RES = CC_RES, CanCov_FHR = FHR_CC) %>%
   left_join(
     dat_grid %>%
-      select(USNG_Code, Latitude, percOpn_2018:TWI),
+      select(USNG_Code, Latitude, percOpn_2018:TWI, LowMont),
     by = "USNG_Code"
-  )
+  ) %>%
+  filter(StudyArea == 1)
 
 # Index PIPO specialist species #
 spp_cat <- read.csv("Spp_list_detected_&_categorized.csv", header = T, stringsAsFactors = F)
@@ -62,13 +66,14 @@ dat_point$SR0 <- dat_point$Spec0 <- dat_point$Rat0 <-
   dat_point$DRat_FHR <- dat_point$DRt_FHRp <- dat_point$DSR_RES <- dat_point$DSR_RESp <-
   dat_point$DSpc_RES <- dat_point$DSp_RESp <- dat_point$DRat_RES <- dat_point$DRt_RESp <- NA
 dat_point <- dat_point %>%
-  select(Id:TWI, SR0:DRt_RESp)
+  select(Id:LowMont, SR0:DRt_RESp)
 Psi_spp_pred0 <- Psi_spp_pred_FHR <- Psi_spp_pred_RES <-
   Diff_spp_FHR <- Diff_spp_RES <- Diff_spp_FHRp <- Diff_spp_RESp <-
   matrix(NA, nrow = nrow(dat_point), ncol = length(spp_pred),
          dimnames = list(NULL, spp_pred))
 
 # For transfer to analysis server #
+rm(chunks.loc)
 #save.image("Mapping_workspace_point.RData")
 #load("Mapping_workspace_point.RData")
 
@@ -83,6 +88,7 @@ beta.PAROpn <-   mod$sims.list$beta1[,,3] %>%  array(dim = c(nsamp, length(spp.l
 beta.Latitude <- mod$sims.list$beta1[,,4] %>%  array(dim = c(nsamp, length(spp.list), chunk.size))
 beta.heatload <- mod$sims.list$beta1[,,5] %>%  array(dim = c(nsamp, length(spp.list), chunk.size))
 beta.TWI <-      mod$sims.list$beta1[,,6] %>%  array(dim = c(nsamp, length(spp.list), chunk.size))
+beta.LowMont <-  mod$sims.list$beta1[,,7] %>%  array(dim = c(nsamp, length(spp.list), chunk.size))
 alpha0 <-        mod$sims.list$alpha0 %>%      array(dim = c(nsamp, length(spp.list), chunk.size))
 alpha.CanCov <-  mod$sims.list$alpha1[,,1] %>% array(dim = c(nsamp, length(spp.list), chunk.size))
 alpha.CanCov2 <- mod$sims.list$alpha1[,,1] %>% array(dim = c(nsamp, length(spp.list), chunk.size))
@@ -102,11 +108,13 @@ for(chnk in chunks) {
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
   TWI <- ((dat_point_chunk$TWI - mean(landscape_data$TWI)) / sd(landscape_data$TWI)) %>%
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
+  LowMont <- ((dat_point_chunk$LowMont - mean(landscape_data$LowMont)) / sd(landscape_data$LowMont)) %>%
+    array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
   
   # 2018 #
-  percGap <- ((dat_point_chunk$percGap_2018 - mean(landscape_data$PACC10)) / sd(landscape_data$PACC10)) %>%
+  percGap <- ((dat_point_chunk$percGap_2018 - mean(landscape_data$PACC10 * 100)) / sd(landscape_data$PACC10 * 100)) %>%
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
-  percOpn <- ((dat_point_chunk$percOpn_2018 - mean(landscape_data$PACC40)) / sd(landscape_data$PACC40)) %>%
+  percOpn <- ((dat_point_chunk$percOpn_2018 - mean(landscape_data$PACC40 * 100)) / sd(landscape_data$PACC40 * 100)) %>%
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
   PAROpn <- (dat_point_chunk$PAROpn_2018 %>%
                (function(x) ifelse(is.na(x), 0, (x - mean(landscape_data$mnPerArRatio_Opn)) / sd(landscape_data$mnPerArRatio_Opn)))) %>%
@@ -115,7 +123,8 @@ for(chnk in chunks) {
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
   
   psi <- (beta0[,,1:n] + beta.percGap[,,1:n] * percGap + beta.percOpn[,,1:n] * percOpn + beta.PAROpn[,,1:n] * PAROpn +
-            beta.Latitude[,,1:n] * Latitude + beta.heatload[,,1:n] * heatload + beta.TWI[,,1:n] * TWI) %>%
+            beta.Latitude[,,1:n] * Latitude + beta.heatload[,,1:n] * heatload + beta.TWI[,,1:n] * TWI +
+            beta.LowMont[,,1:n] * LowMont) %>%
     (function(x) ifelse(x > 709, 709, x)) %>% # Truncate to avoid NAs
     QSLpersonal::expit()
   theta <- (alpha0[,,1:n] + alpha.CanCov[,,1:n] * CanCov + alpha.CanCov2[,,1:n] * CanCov^2) %>%
@@ -133,9 +142,9 @@ for(chnk in chunks) {
   apply(occ_cond0[,spp_pred_ind,], c(3, 2), median) %>% saveObject(str_c(chunks.loc, "Psi_spp_pred0_chnk", str_pad(chnk, width = 4, side = "left", pad = "0")))
   
   # FHR #
-  percGap <- ((dat_point_chunk$percGap_FHR - mean(landscape_data$PACC10)) / sd(landscape_data$PACC10)) %>%
+  percGap <- ((dat_point_chunk$percGap_FHR - mean(landscape_data$PACC10 * 100)) / sd(landscape_data$PACC10 * 100)) %>%
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
-  percOpn <- ((dat_point_chunk$percOpn_FHR - mean(landscape_data$PACC40)) / sd(landscape_data$PACC40)) %>%
+  percOpn <- ((dat_point_chunk$percOpn_FHR - mean(landscape_data$PACC40 * 100)) / sd(landscape_data$PACC40 * 100)) %>%
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
   PAROpn <- (dat_point_chunk$PAROpn_FHR %>%
                (function(x) ifelse(is.na(x), 0, (x - mean(landscape_data$mnPerArRatio_Opn)) / sd(landscape_data$mnPerArRatio_Opn)))) %>%
@@ -144,7 +153,8 @@ for(chnk in chunks) {
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
   
   psi <- (beta0[,,1:n] + beta.percGap[,,1:n] * percGap + beta.percOpn[,,1:n] * percOpn + beta.PAROpn[,,1:n] * PAROpn +
-            beta.Latitude[,,1:n] * Latitude + beta.heatload[,,1:n] * heatload + beta.TWI[,,1:n] * TWI) %>%
+            beta.Latitude[,,1:n] * Latitude + beta.heatload[,,1:n] * heatload + beta.TWI[,,1:n] * TWI +
+            beta.LowMont[,,1:n] * LowMont) %>%
     (function(x) ifelse(x > 709, 709, x)) %>% # Truncate to avoid NAs
     QSLpersonal::expit()
   theta <- (alpha0[,,1:n] + alpha.CanCov[,,1:n] * CanCov + alpha.CanCov2[,,1:n] * CanCov^2) %>%
@@ -173,9 +183,9 @@ for(chnk in chunks) {
     saveObject(str_c(chunks.loc, "Diff_spp_FHRp_chnk", str_pad(chnk, width = 4, side = "left", pad = "0")))
   
   # RES #
-  percGap <- ((dat_point_chunk$percGap_RES - mean(landscape_data$PACC10)) / sd(landscape_data$PACC10)) %>%
+  percGap <- ((dat_point_chunk$percGap_RES - mean(landscape_data$PACC10 * 100)) / sd(landscape_data$PACC10 * 100)) %>%
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
-  percOpn <- ((dat_point_chunk$percOpn_RES - mean(landscape_data$PACC40)) / sd(landscape_data$PACC40)) %>%
+  percOpn <- ((dat_point_chunk$percOpn_RES - mean(landscape_data$PACC40 * 100)) / sd(landscape_data$PACC40 * 100)) %>%
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
   PAROpn <- (dat_point_chunk$PAROpn_RES %>%
                (function(x) ifelse(is.na(x), 0, (x - mean(landscape_data$mnPerArRatio_Opn)) / sd(landscape_data$mnPerArRatio_Opn)))) %>%
@@ -184,7 +194,8 @@ for(chnk in chunks) {
     array(dim = c(n, nsamp, length(spp.list))) %>% aperm(c(2, 3, 1))
   
   psi <- (beta0[,,1:n] + beta.percGap[,,1:n] * percGap + beta.percOpn[,,1:n] * percOpn + beta.PAROpn[,,1:n] * PAROpn +
-            beta.Latitude[,,1:n] * Latitude + beta.heatload[,,1:n] * heatload + beta.TWI[,,1:n] * TWI) %>%
+            beta.Latitude[,,1:n] * Latitude + beta.heatload[,,1:n] * heatload + beta.TWI[,,1:n] * TWI +
+            beta.LowMont[,,1:n] * LowMont) %>%
     (function(x) ifelse(x > 709, 709, x)) %>% # Truncate to avoid NAs
     QSLpersonal::expit()
   theta <- (alpha0[,,1:n] + alpha.CanCov[,,1:n] * CanCov + alpha.CanCov2[,,1:n] * CanCov^2) %>%
@@ -217,7 +228,7 @@ for(chnk in chunks) {
 }
 
 # Pull together the chunks and save for joining with shapefile in ArcGIS #
-load("Mapping_workspace_point.RData")
+#load("Mapping_workspace_point.RData")
 chunks.loc <- "predChunks/point/"
 chunk.size <- 250
 chunks <- 1:ceiling(nrow(dat_point) / chunk.size)

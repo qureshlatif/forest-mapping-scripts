@@ -56,31 +56,31 @@ for(sp in 1:length(spp.plt)) {
     ylab(NULL) + xlab(NULL) +
     theme(axis.text.x=element_text(size=20)) +
     theme(axis.text.y=element_text(size=20)) +
-    annotate(geom = "text", x = mean(x), y = 1, label = str_wrap(sp.com, 20), size = 6, vjust = 1)
+    annotate(geom = "text", x = mean(x), y = 1, label = str_wrap(sp.com, 17), size = 6, vjust = 1)
   assign(str_c("p.", sp.plt), p)
 }
 
 p <- ggdraw() + 
-  draw_plot(p.BTHU, x = 0.0500000, y = 0.8416667, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.WEWP, x = 0.3666667, y = 0.8416667, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.HAFL, x = 0.6833333, y = 0.8416667, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.PLVI, x = 0.0500000, y = 0.6833333, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.WAVI, x = 0.3666667, y = 0.6833333, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.CLNU, x = 0.6833333, y = 0.6833333, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.VGSW, x = 0.0500000, y = 0.5250000, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.PYNU, x = 0.3666667, y = 0.5250000, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.HOWR, x = 0.6833333, y = 0.5250000, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.WEBL, x = 0.0500000, y = 0.3666667, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.MOBL, x = 0.3666667, y = 0.3666667, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.TOSO, x = 0.6833333, y = 0.3666667, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.AMRO, x = 0.0500000, y = 0.2083333, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.EVGR, x = 0.3666667, y = 0.2083333, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.RECR, x = 0.6833333, y = 0.2083333, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.CHSP, x = 0.0500000, y = 0.0500000, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.GTTO, x = 0.3666667, y = 0.0500000, width = 0.3166667, height = 0.1583333) +
-  draw_plot(p.WETA, x = 0.6833333, y = 0.0500000, width = 0.3166667, height = 0.1583333) +
+  draw_plot(p.BTHU, x = 0,    y = 0.75, width = 0.25, height = 0.25) +
+  draw_plot(p.WEWP, x = 0.25, y = 0.75, width = 0.25, height = 0.25) +
+  draw_plot(p.HAFL, x = 0.5,  y = 0.75, width = 0.25, height = 0.25) +
+  draw_plot(p.PLVI, x = 0.75, y = 0.75, width = 0.25, height = 0.25) +
+  draw_plot(p.WAVI, x = 0,    y = 0.5,  width = 0.25, height = 0.25) +
+  draw_plot(p.CLNU, x = 0.25, y = 0.5,  width = 0.25, height = 0.25) +
+  draw_plot(p.VGSW, x = 0.5,  y = 0.5,  width = 0.25, height = 0.25) +
+  draw_plot(p.PYNU, x = 0.75, y = 0.5,  width = 0.25, height = 0.25) +
+  draw_plot(p.HOWR, x = 0,    y = 0.25, width = 0.25, height = 0.25) +
+  draw_plot(p.WEBL, x = 0.25, y = 0.25, width = 0.25, height = 0.25) +
+  draw_plot(p.TOSO, x = 0.5,  y = 0.25, width = 0.25, height = 0.25) +
+  draw_plot(p.EVGR, x = 0.75, y = 0.25, width = 0.25, height = 0.25) +
+  draw_plot(p.RECR, x = 0,    y = 0,    width = 0.25, height = 0.25) +
+  draw_plot(p.CHSP, x = 0.25, y = 0,    width = 0.25, height = 0.25) +
+  draw_plot(p.GTTO, x = 0.5,  y = 0,    width = 0.25, height = 0.25) +
+  draw_plot(p.WETA, x = 0.75, y = 0,    width = 0.25, height = 0.25)
+p <- ggdraw() +
+  draw_plot(p, x = 0.05, y = 0.05, width = 0.95, height = 0.95) +
   draw_plot_label(c("Point occupancy", "Canopy cover (%)"),
                   x = c(0, 0.55), y = c(0.55, 0.05), size = c(28, 28),
                   angle = c(90, 0), hjust = c(0.5, 0.5))
 
-save_plot(str_c("Plot_spp_", x.var, "_relations.jpg"), p, ncol = 2.5, nrow = 3.5, dpi = 200)
+save_plot(str_c("Plot_spp_", x.var, "_relations.jpg"), p, ncol = 3, nrow = 3, dpi = 200)
