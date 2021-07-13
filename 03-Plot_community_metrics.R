@@ -139,9 +139,7 @@ dat.plt$Special_ratio.phi <- apply(SR, 2, function(x) quantile(x, prob = 0.975, 
 
 dplt.CanCov <- dat.plt
 
-###################################
-## Plot overall species richness ##
-###################################
+## Species richness ##
 
 ymin <- min(dplt.PACCGap$SR.plo, dplt.PACCOpn$SR.plo)
 ymax <- max(dplt.PACCGap$SR.phi, dplt.PACCOpn$SR.phi)
@@ -153,7 +151,7 @@ p.PACCGap.SR <- ggplot(data = dat.plt, aes(x = x, y = SR.pred)) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
   ylim(ymin, ymax) +
-  labs(x = "Canopy gaps (%)", y = NULL) +
+  labs(x = NULL, y = "(100 ha scale)") +
   guides(color = FALSE, fill = FALSE)
 
 dat.plt <- dplt.PACCOpn
@@ -163,7 +161,8 @@ p.PACCOpn.SR <- ggplot(data = dat.plt, aes(x = x, y = SR.pred)) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
   ylim(ymin, ymax) +
-  labs(x = "Open forest (%)", y = NULL, color = "Life Zone", fill = "Life Zone")
+  labs(x = NULL, y = "(100 ha scale)") +
+  guides(color = FALSE, fill = FALSE)
 
 dat.plt <- dplt.CanCov
 p.CanCov.SR <- ggplot(data = dat.plt, aes(x = x, y = SR.pred)) + 
@@ -171,25 +170,11 @@ p.CanCov.SR <- ggplot(data = dat.plt, aes(x = x, y = SR.pred)) +
   geom_line(aes(x = x, y = SR.pred, color = Zone), size = 1.5) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
-  labs(x = "Canopy cover (%)", y = NULL) +
-  guides(color = FALSE, fill = FALSE)
-
-p <- ggdraw() + 
-  draw_plot(p.PACCGap.SR, x = 0,    y = 0.5, width = 0.47, height = 0.5) +
-  draw_plot(p.PACCOpn.SR, x = 0.47, y = 0.5, width = 0.53, height = 0.5) +
-  draw_plot(p.CanCov.SR,  x = 0,    y = 0,   width = 1,    height = 0.5)
-p <- ggdraw() +
-  draw_plot(p, x = 0.05, y = 0, width = 0.95, height = 0.95) +
-  draw_plot_label(c("Point richness", "Grid cell richness", "All species"),
-                  x = c(0, 0, 0.55), y = c(0.3, 0.75, 1), size = 15,
-                  angle = c(90, 90, 0), hjust = c(0.5, 0.5, 0.5))
-
-save_plot(str_c("Plot_species_richness.jpg"), p, ncol = 2, nrow = 2, dpi = 200)
+  labs(x = NULL, y = "(4.9 ha scale)", color = "Life Zone", fill = "Life Zone") +
+  theme(legend.position = c(1,0), legend.justification = c(1,0))
 
 
-###################################
-## Plot PIPO specialist richness ##
-###################################
+## Specialist richness ##
 
 ymin <- min(dplt.PACCGap$SR_spec.plo, dplt.PACCOpn$SR_spec.plo)
 ymax <- max(dplt.PACCGap$SR_spec.phi, dplt.PACCOpn$SR_spec.phi)
@@ -201,7 +186,7 @@ p.PACCGap.PSR <- ggplot(data = dat.plt, aes(x = x, y = SR_spec.pred)) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
   ylim(ymin, ymax) +
-  labs(x = "Canopy gaps (%)", y = NULL) +
+  labs(x = NULL, y = "(100 ha scale)") +
   guides(color = FALSE, fill = FALSE)
 
 dat.plt <- dplt.PACCOpn
@@ -211,7 +196,8 @@ p.PACCOpn.PSR <- ggplot(data = dat.plt, aes(x = x, y = SR_spec.pred)) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
   ylim(ymin, ymax) +
-  labs(x = "Open forest (%)", y = NULL, color = "Life Zone", fill = "Life Zone")
+  labs(x = NULL, y = "(100 ha scale)") +
+  guides(color = FALSE, fill = FALSE)
 
 dat.plt <- dplt.CanCov
 p.CanCov.PSR <- ggplot(data = dat.plt, aes(x = x, y = SR_spec.pred)) + 
@@ -219,24 +205,10 @@ p.CanCov.PSR <- ggplot(data = dat.plt, aes(x = x, y = SR_spec.pred)) +
   geom_line(aes(x = x, y = SR_spec.pred, color = Zone), size = 1.5) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
-  labs(x = "Canopy cover (%)", y = NULL) +
+  labs(x = NULL, y = "(4.9 ha scale)") +
   guides(color = FALSE, fill = FALSE)
 
-p <- ggdraw() + 
-  draw_plot(p.PACCGap.PSR, x = 0,    y = 0.5, width = 0.47, height = 0.5) +
-  draw_plot(p.PACCOpn.PSR, x = 0.47, y = 0.5, width = 0.53, height = 0.5) +
-  draw_plot(p.CanCov.PSR,  x = 0,    y = 0,   width = 1,    height = 0.5)
-p <- ggdraw() +
-  draw_plot(p, x = 0.05, y = 0, width = 0.95, height = 0.95) +
-  draw_plot_label(c("Point richness", "Grid cell richness", "Ponderosa pine forest specialists"),
-                  x = c(0, 0, 0.55), y = c(0.3, 0.75, 1), size = 15,
-                  angle = c(90, 90, 0), hjust = c(0.5, 0.5, 0.5))
-
-save_plot(str_c("Plot_PIPO_specialist_richness.jpg"), p, ncol = 2, nrow = 2, dpi = 200)
-
-####################################
-## Plot specialist/riffraff ratio ##
-####################################
+## Species composition ratio ##
 
 ymin <- min(dplt.PACCGap$Special_ratio.plo, dplt.PACCOpn$Special_ratio.plo)
 ymax <- max(dplt.PACCGap$Special_ratio.phi, dplt.PACCOpn$Special_ratio.phi)
@@ -248,7 +220,7 @@ p.PACCGap.SCR <- ggplot(data = dat.plt, aes(x = x, y = Special_ratio.pred)) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
   ylim(ymin, ymax) +
-  labs(x = "Canopy gaps (%)", y = NULL) +
+  labs(x = NULL, y = "(100 ha scale)") +
   guides(color = FALSE, fill = FALSE)
 
 dat.plt <- dplt.PACCOpn
@@ -258,7 +230,8 @@ p.PACCOpn.SCR <- ggplot(data = dat.plt, aes(x = x, y = Special_ratio.pred)) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
   ylim(ymin, ymax) +
-  labs(x = "Open forest (%)", y = NULL, color = "Life Zone", fill = "Life Zone")
+  labs(x = NULL, y = "(100 ha scale)") +
+  guides(color = FALSE, fill = FALSE)
 
 dat.plt <- dplt.CanCov
 p.CanCov.SCR <- ggplot(data = dat.plt, aes(x = x, y = Special_ratio.pred)) + 
@@ -266,118 +239,30 @@ p.CanCov.SCR <- ggplot(data = dat.plt, aes(x = x, y = Special_ratio.pred)) +
   geom_line(aes(x = x, y = Special_ratio.pred, color = Zone), size = 1.5) +
   scale_color_manual(values = c("saddlebrown", "#009E73")) +
   scale_fill_manual(values = c("saddlebrown", "#009E73")) +
-  labs(x = "Canopy cover (%)", y = NULL) +
+  labs(x = NULL, y = "(4.9 ha scale)") +
   guides(color = FALSE, fill = FALSE)
 
+
+## Put em all together ##
+
 p <- ggdraw() + 
-  draw_plot(p.PACCGap.SCR, x = 0,    y = 0.5, width = 0.47, height = 0.5) +
-  draw_plot(p.PACCOpn.SCR, x = 0.47, y = 0.5, width = 0.53, height = 0.5) +
-  draw_plot(p.CanCov.SCR,  x = 0,    y = 0,   width = 1,    height = 0.5)
+  draw_plot(p.PACCGap.SR,  x = 0,      y = 0.6667, width = 0.3333, height = 0.3333) +
+  draw_plot(p.PACCOpn.SR,  x = 0.3333, y = 0.6667, width = 0.3333, height = 0.3333) +
+  draw_plot(p.CanCov.SR,   x = 0.6667, y = 0.6667, width = 0.3333, height = 0.3333) +
+  draw_plot(p.PACCGap.PSR, x = 0,      y = 0.3333, width = 0.3333, height = 0.3333) +
+  draw_plot(p.PACCOpn.PSR, x = 0.3333, y = 0.3333, width = 0.3333, height = 0.3333) +
+  draw_plot(p.CanCov.PSR,  x = 0.6667, y = 0.3333, width = 0.3333, height = 0.3333) +
+  draw_plot(p.PACCGap.SCR, x = 0,      y = 0,      width = 0.3333, height = 0.3333) +
+  draw_plot(p.PACCOpn.SCR, x = 0.3333, y = 0,      width = 0.3333, height = 0.3333) +
+  draw_plot(p.CanCov.SCR,  x = 0.6667, y = 0,      width = 0.3333, height = 0.3333)
 p <- ggdraw() +
-  draw_plot(p, x = 0.05, y = 0, width = 0.95, height = 0.95) +
-  draw_plot_label(c("Point ratio", "Grid cell ratio", "PIPO specialist ratio"),
-                  x = c(0, 0, 0.55), y = c(0.3, 0.75, 1), size = 15,
-                  angle = c(90, 90, 0), hjust = c(0.5, 0.5, 0.5))
+  draw_plot(p, x = 0.05, y = 0.05, width = 0.95, height = 0.95) +
+  draw_plot_label(c("Species richness", "Specialist richness", "Specialist-generalist ratio",
+                    "Canopy gaps (%)", "Open forest (%)", "Canopy cover (%)"),
+                  x = c(0, 0, 0, 0.21, 0.55, 0.87),
+                  y = c(0.87, 0.55, 0.21, 0.05, 0.05, 0.05), size = 20,
+                  angle = c(90, 90, 90, 0, 0, 0),
+                  hjust = c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5))
 
-save_plot(str_c("Plot_PIPO_specialist_ratio.jpg"), p, ncol = 2, nrow = 2, dpi = 200)
+save_plot("Plot_community_metrics.jpg", p, ncol = 2, nrow = 3, dpi = 200)
 
-##################################
-# Get em all in one panel for MS #
-##################################
-
-
-
-
-# ##################################
-# ## Plot PIPO associate richness ##
-# ##################################
-# 
-# ymin <- min(dplt.PACCGap$SR_assoc.plo, dplt.PACCOpn$SR_assoc.plo, dplt.PAROpn$SR_assoc.plo)
-# ymax <- max(dplt.PACCGap$SR_assoc.phi, dplt.PACCOpn$SR_assoc.phi, dplt.PAROpn$SR_assoc.phi)
-# 
-# dat.plt <- dplt.PACCGap
-# p.PACCGap <- ggplot(data = dat.plt, aes(x = x, y = SR_assoc.pred)) + 
-#   geom_ribbon(aes(x = x, ymin = SR_assoc.plo, ymax = SR_assoc.phi), alpha = 0.3) +
-#   geom_line(aes(x = x, y = SR_assoc.pred), size = 1.5) +
-#   ylim(ymin, ymax) +
-#   labs(x = "Canopy gaps (%)", y = NULL)
-# 
-# dat.plt <- dplt.PACCOpn
-# p.PACCOpn <- ggplot(data = dat.plt, aes(x = x, y = SR_assoc.pred)) + 
-#   geom_ribbon(aes(x = x, ymin = SR_assoc.plo, ymax = SR_assoc.phi), alpha = 0.3) +
-#   geom_line(aes(x = x, y = SR_assoc.pred), size = 1.5) +
-#   ylim(ymin, ymax) +
-#   labs(x = "Open forest (%)", y = NULL)
-# 
-# dat.plt <- dplt.PAROpn
-# p.PAROpn <- ggplot(data = dat.plt, aes(x = x, y = SR_assoc.pred)) + 
-#   geom_ribbon(aes(x = x, ymin = SR_assoc.plo, ymax = SR_assoc.phi), alpha = 0.3) +
-#   geom_line(aes(x = x, y = SR_assoc.pred), size = 1.5) +
-#   ylim(ymin, ymax) +
-#   labs(x = str_wrap("Open forest perimeter-area ratio", 30), y = NULL)
-# 
-# dat.plt <- dplt.CanCov
-# p.CanCov <- ggplot(data = dat.plt, aes(x = x, y = SR_assoc.pred)) + 
-#   geom_ribbon(aes(x = x, ymin = SR_assoc.plo, ymax = SR_assoc.phi), alpha = 0.3) +
-#   geom_line(aes(x = x, y = SR_assoc.pred), size = 1.5) +
-#   labs(x = "Canopy cover (%)", y = NULL)
-# 
-# p <- ggdraw() + 
-#   draw_plot(p.PACCGap, x = 0,      y = 0.5, width = 0.3333, height = 0.5) +
-#   draw_plot(p.PACCOpn, x = 0.3333, y = 0.5, width = 0.3333, height = 0.5) +
-#   draw_plot(p.PAROpn,  x = 0.6667, y = 0.5, width = 0.3333, height = 0.5) +
-#   draw_plot(p.CanCov,  x = 0,      y = 0,   width = 1,      height = 0.5)
-# p <- ggdraw() +
-#   draw_plot(p, x = 0.05, y = 0, width = 0.95, height = 0.95) +
-#   draw_plot_label(c("Point richness", "Grid cell richness", "Ponderosa pine forest associates"),
-#                   x = c(0, 0, 0.55), y = c(0.3, 0.75, 1), size = 15,
-#                   angle = c(90, 90, 0), hjust = c(0.5, 0.5, 0.5))
-# 
-# save_plot(str_c("Plot_PIPO_associate_richness.jpg"), p, ncol = 2, nrow = 2, dpi = 200)
-
-# ###################################
-# ## Plot associate/riffraff ratio ##
-# ###################################
-# 
-# ymin <- min(dplt.PACCGap$Assoc_ratio.plo, dplt.PACCOpn$Assoc_ratio.plo, dplt.PAROpn$Assoc_ratio.plo)
-# ymax <- max(dplt.PACCGap$Assoc_ratio.phi, dplt.PACCOpn$Assoc_ratio.phi, dplt.PAROpn$Assoc_ratio.phi)
-# 
-# dat.plt <- dplt.PACCGap
-# p.PACCGap <- ggplot(data = dat.plt, aes(x = x, y = Assoc_ratio.pred)) + 
-#   geom_ribbon(aes(x = x, ymin = Assoc_ratio.plo, ymax = Assoc_ratio.phi), alpha = 0.3) +
-#   geom_line(aes(x = x, y = Assoc_ratio.pred), size = 1.5) +
-#   ylim(ymin, ymax) +
-#   labs(x = "Canopy gaps (%)", y = NULL)
-# 
-# dat.plt <- dplt.PACCOpn
-# p.PACCOpn <- ggplot(data = dat.plt, aes(x = x, y = Assoc_ratio.pred)) + 
-#   geom_ribbon(aes(x = x, ymin = Assoc_ratio.plo, ymax = Assoc_ratio.phi), alpha = 0.3) +
-#   geom_line(aes(x = x, y = Assoc_ratio.pred), size = 1.5) +
-#   ylim(ymin, ymax) +
-#   labs(x = "Open forest (%)", y = NULL)
-# 
-# dat.plt <- dplt.PAROpn
-# p.PAROpn <- ggplot(data = dat.plt, aes(x = x, y = Assoc_ratio.pred)) + 
-#   geom_ribbon(aes(x = x, ymin = Assoc_ratio.plo, ymax = Assoc_ratio.phi), alpha = 0.3) +
-#   geom_line(aes(x = x, y = Assoc_ratio.pred), size = 1.5) +
-#   ylim(ymin, ymax) +
-#   labs(x = str_wrap("Open forest perimeter-area ratio", 30), y = NULL)
-# 
-# dat.plt <- dplt.CanCov
-# p.CanCov <- ggplot(data = dat.plt, aes(x = x, y = Assoc_ratio.pred)) + 
-#   geom_ribbon(aes(x = x, ymin = Assoc_ratio.plo, ymax = Assoc_ratio.phi), alpha = 0.3) +
-#   geom_line(aes(x = x, y = Assoc_ratio.pred), size = 1.5) +
-#   labs(x = "Canopy cover (%)", y = NULL)
-# 
-# p <- ggdraw() + 
-#   draw_plot(p.PACCGap, x = 0,      y = 0.5, width = 0.3333, height = 0.5) +
-#   draw_plot(p.PACCOpn, x = 0.3333, y = 0.5, width = 0.3333, height = 0.5) +
-#   draw_plot(p.PAROpn,  x = 0.6667, y = 0.5, width = 0.3333, height = 0.5) +
-#   draw_plot(p.CanCov,  x = 0,      y = 0,   width = 1,      height = 0.5)
-# p <- ggdraw() +
-#   draw_plot(p, x = 0.05, y = 0, width = 0.95, height = 0.95) +
-#   draw_plot_label(c("Point ratio", "Grid cell ratio", "PIPO associate ratio"),
-#                   x = c(0, 0, 0.55), y = c(0.3, 0.75, 1), size = 15,
-#                   angle = c(90, 90, 0), hjust = c(0.5, 0.5, 0.5))
-# 
-# save_plot(str_c("Plot_PIPO_associate_ratio.jpg"), p, ncol = 2, nrow = 2, dpi = 200)

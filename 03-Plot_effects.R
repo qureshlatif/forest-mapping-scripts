@@ -54,7 +54,7 @@ tbl_pars <- tbl_pars[which(spp.detected),]
 
 #### Plot grid level vegetation relationships ####
 pars.sub <- c("beta.PACC10", "beta.PACC40", "beta.mnPerArRatio_Opn", "alpha.CanCov", "alpha.CanCov2")
-dat.plt <- tbl_pars %>% tbl_df() %>%
+dat.plt <- tbl_pars %>% as_tibble() %>%
   select(beta.PACC10:beta.mnPerArRatio_Opn.hi, alpha.CanCov:alpha.CanCov2.hi) %>%
   mutate(Spp = spp.list[which(spp.detected)]) %>%
   mutate(index = row_number() %>% rev())

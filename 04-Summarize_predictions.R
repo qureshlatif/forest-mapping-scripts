@@ -120,7 +120,7 @@ out["CanCov", ] <- dat_point %>% filter(LowMont == 1) %>%
 
 write.csv(out, "Map_summaries.csv")
 
-## Summaries of the landscape ##
+## Summaries of differences with reference scenario ##
 cols <- c("DFHR_low", "DRES_low", "DFHR_upp", "DRES_upp")
 rows <- c("SRGrid", "SRPoint", "SpecGrid", "SpecPoint", "RatGrid", "RatPoint")
 out <- matrix("", nrow = length(rows), ncol = length(cols),
@@ -128,22 +128,22 @@ out <- matrix("", nrow = length(rows), ncol = length(cols),
 
 out["SRGrid", ] <- dat_grid %>% filter(LowMont == 1) %>%
   select(DSR_FHR, DSR_RES) %>%
-  summarise_all(sum.fn) %>% as.matrix() %>% as.character() %>%
+  summarise_all(sum.fn, dig = 3) %>% as.matrix() %>% as.character() %>%
   c(dat_grid %>% filter(LowMont == 0) %>%
       select(DSR_FHR, DSR_RES) %>%
-      summarise_all(sum.fn) %>% as.matrix() %>% as.character())
+      summarise_all(sum.fn, dig = 3) %>% as.matrix() %>% as.character())
 out["SpecGrid", ] <- dat_grid %>% filter(LowMont == 1) %>%
   select(DSpc_FHR, DSpc_RES) %>%
-  summarise_all(sum.fn) %>% as.matrix() %>% as.character() %>%
+  summarise_all(sum.fn, dig = 3) %>% as.matrix() %>% as.character() %>%
   c(dat_grid %>% filter(LowMont == 0) %>%
       select(DSpc_FHR, DSpc_RES) %>%
-      summarise_all(sum.fn) %>% as.matrix() %>% as.character())
+      summarise_all(sum.fn, dig = 3) %>% as.matrix() %>% as.character())
 out["RatGrid", ] <- dat_grid %>% filter(LowMont == 1) %>%
   select(DRat_FHR, DRat_RES) %>%
-  summarise_all(sum.fn) %>% as.matrix() %>% as.character() %>%
+  summarise_all(sum.fn, dig = 3) %>% as.matrix() %>% as.character() %>%
   c(dat_grid %>% filter(LowMont == 0) %>%
       select(DRat_FHR, DRat_RES) %>%
-      summarise_all(sum.fn) %>% as.matrix() %>% as.character())
+      summarise_all(sum.fn, dig = 3) %>% as.matrix() %>% as.character())
 
 out["SRPoint", ] <- dat_point %>% filter(LowMont == 1) %>%
   select(DSR_FHR, DSR_RES) %>%
@@ -159,10 +159,10 @@ out["SpecPoint", ] <- dat_point %>% filter(LowMont == 1) %>%
       summarise_all(sum.fn) %>% as.matrix() %>% as.character())
 out["RatPoint", ] <- dat_point %>% filter(LowMont == 1) %>%
   select(DRat_FHR, DRat_RES) %>%
-  summarise_all(sum.fn) %>% as.matrix() %>% as.character() %>%
+  summarise_all(sum.fn, dig = 3) %>% as.matrix() %>% as.character() %>%
   c(dat_point %>% filter(LowMont == 0) %>%
       select(DRat_FHR, DRat_RES) %>%
-      summarise_all(sum.fn) %>% as.matrix() %>% as.character())
+      summarise_all(sum.fn, dig = 3) %>% as.matrix() %>% as.character())
 
 write.csv(out, "Map_summaries_diff.csv")
 
@@ -287,3 +287,31 @@ plot(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$DSR_RES
 
 # I suspect with restoration, heterogeneity is positively related with treatment intensity, whereas with fuels reduction the opposite is true.
 # This is probably why you have opposite relationships between change in hetergeneity and change in species richness with FHR (negative) vs RES (positive).
+
+## Summarize and tabulate heterogeneity ##
+dat_catch <- dat_catch %>%
+  left_join(
+    dat_point_sum %>% select(CatchID, LowMont) %>%
+      distinct(),
+    by = c("FEATURE" = "CatchID")
+  )
+
+cols <- c("Ref", "FHR", "FHR_Diff", "RES", "RES_Diff")
+rows <- c("H_LowM", "RC2_LowM", "H_UppM", "RC2_UppM")
+out <- matrix("", nrow = length(rows), ncol = length(cols),
+              dimnames = list(rows, cols))
+
+out["H_LowM", ] <- dat_catch %>% filter(LowMont == 1) %>%
+  select(H_UNT, H_FHR, H_FHRd, H_RES, H_RESd) %>%
+  summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
+out["H_UppM", ] <- dat_catch %>% filter(LowMont == 0) %>%
+  select(H_UNT, H_FHR, H_FHRd, H_RES, H_RESd) %>%
+  summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
+out["RC2_LowM", ] <- dat_catch %>% filter(LowMont == 1) %>%
+  select(RC2_UNT, RC2_FHR, RC2_FHRd, RC2_RES, RC2_RESd) %>%
+  summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
+out["RC2_UppM", ] <- dat_catch %>% filter(LowMont == 0) %>%
+  select(RC2_UNT, RC2_FHR, RC2_FHRd, RC2_RES, RC2_RESd) %>%
+  summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
+
+write.csv(out, "Heterogeneity_summaries.csv")
