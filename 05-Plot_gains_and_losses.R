@@ -1,5 +1,6 @@
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 
 setwd("C:/Users/Quresh.Latif/files/projects/CEAP_map_tool")
 load("Data_compiled.RData")
@@ -8,7 +9,7 @@ dat <- read.csv("Map_summaries_area.csv", header = T, stringsAsFactors = F) %>%
   rename(Class = X) %>%
   mutate(Zone = str_sub(Class, -7, -1)) %>%
   mutate(MetricScale = str_sub(Class, 1, -9)) %>%
-  mutate(Metric = ifelse(str_detect(Class, "SR"), "Species",
+  mutate(Metric = ifelse(str_detect(Class, "SR"), "All species",
                          ifelse(str_detect(Class, "Spec"), "Specialists", "S-G ratio"))) %>%
   mutate(Scale = ifelse(str_detect(Class, "Grid"), "1km", "250m")) %>%
   select(Metric, Scale, Zone, FHR_Gain:RES_Loss)
@@ -25,7 +26,7 @@ dat.plot <- dat %>% filter(Zone == "UppMont") %>%
       rename(Area = FHR_Loss)
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
-  mutate(Metric = factor(Metric, levels = c("Species", "Specialists", "S-G ratio")),
+  mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
          Scale = factor(Scale, levels = c("1km", "250m")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Upper_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
@@ -48,7 +49,7 @@ dat.plot <- dat %>% filter(Zone == "UppMont") %>%
       rename(Area = RES_Loss)
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
-  mutate(Metric = factor(Metric, levels = c("Species", "Specialists", "S-G ratio")),
+  mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
          Scale = factor(Scale, levels = c("1km", "250m")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Upper_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
@@ -71,7 +72,7 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
       rename(Area = FHR_Loss)
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
-  mutate(Metric = factor(Metric, levels = c("Species", "Specialists", "S-G ratio")),
+  mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
          Scale = factor(Scale, levels = c("1km", "250m")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Lower_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
@@ -94,7 +95,7 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
       rename(Area = RES_Loss)
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
-  mutate(Metric = factor(Metric, levels = c("Species", "Specialists", "S-G ratio")),
+  mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
          Scale = factor(Scale, levels = c("1km", "250m")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Lower_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
