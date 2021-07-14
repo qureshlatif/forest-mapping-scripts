@@ -22,6 +22,10 @@ spp.plt <- spp.list[spp.ind]
 spp.common.map <- spp.out$common_name
 names(spp.common.map) <- spp.out$BirdCode
 spp.common <- spp.common.map[spp.plt]
+spp.specialist <- read.csv("Spp_list_detected_&_categorized.csv", header = T, stringsAsFactors = F) %>%
+  filter(PIPO_specialist) %>% pull(common_name)
+spp.common[which(spp.common %in% spp.specialist)] <-
+  str_c(spp.common[which(spp.common %in% spp.specialist)], " (S)")
 
 # Tabulate species estimates for plotting #
 x <- seq(
@@ -83,4 +87,4 @@ p <- ggdraw() +
                   x = c(0, 0.55), y = c(0.55, 0.05), size = c(28, 28),
                   angle = c(90, 0), hjust = c(0.5, 0.5))
 
-save_plot(str_c("Plot_spp_", x.var, "_relations.jpg"), p, ncol = 3, nrow = 3, dpi = 200)
+save_plot(str_c("Plot_spp_", x.var, "_relations.jpg"), p, ncol = 2.5, nrow = 3, dpi = 200)
