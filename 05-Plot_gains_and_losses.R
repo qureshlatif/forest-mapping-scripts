@@ -11,7 +11,7 @@ dat <- read.csv("Map_summaries_area.csv", header = T, stringsAsFactors = F) %>%
   mutate(MetricScale = str_sub(Class, 1, -9)) %>%
   mutate(Metric = ifelse(str_detect(Class, "SR"), "All species",
                          ifelse(str_detect(Class, "Spec"), "Specialists", "S-G ratio"))) %>%
-  mutate(Scale = ifelse(str_detect(Class, "Grid"), "1km", "250m")) %>%
+  mutate(Scale = ifelse(str_detect(Class, "Grid"), "1km cells", "250m cells")) %>%
   select(Metric, Scale, Zone, FHR_Gain:RES_Loss)
 
 # Upper montane, fuels reduction
@@ -27,13 +27,14 @@ dat.plot <- dat %>% filter(Zone == "UppMont") %>%
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
   mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
-         Scale = factor(Scale, levels = c("1km", "250m")),
+         Scale = factor(Scale, levels = c("1km cells", "250m cells")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Upper_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
   facet_grid(. ~ Scale) +
   labs(x=NULL, y=expression("Area ("*km^2*")"), fill=NULL) +
   scale_fill_manual(values = c("#D55E00", "#009E73")) +
+  scale_y_continuous(limits = c(0, 3200)) +
   theme(legend.position = c(1,1), legend.justification = c(1,1),
         axis.text.x = element_text(angle = 10))
 
@@ -50,7 +51,7 @@ dat.plot <- dat %>% filter(Zone == "UppMont") %>%
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
   mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
-         Scale = factor(Scale, levels = c("1km", "250m")),
+         Scale = factor(Scale, levels = c("1km cells", "250m cells")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Upper_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
@@ -58,6 +59,7 @@ p_Upper_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   labs(x=NULL, y=expression("Area ("*km^2*")"), fill=NULL) +
   scale_fill_manual(values = c("#D55E00", "#009E73")) +
   guides(fill = F) +
+  scale_y_continuous(limits = c(0, 3200)) +
   theme(axis.text.x = element_text(angle = 10))
 
 # Lower montane, fuels reduction
@@ -73,7 +75,7 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
   mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
-         Scale = factor(Scale, levels = c("1km", "250m")),
+         Scale = factor(Scale, levels = c("1km cells", "250m cells")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Lower_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
@@ -81,6 +83,7 @@ p_Lower_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   labs(x=NULL, y=expression("Area ("*km^2*")"), fill=NULL) +
   scale_fill_manual(values = c("#D55E00", "#009E73")) +
   guides(fill = F) +
+  scale_y_continuous(limits = c(0, 1900)) +
   theme(axis.text.x = element_text(angle = 10))
 
 # Lower montane, restoration
@@ -96,7 +99,7 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
   mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
-         Scale = factor(Scale, levels = c("1km", "250m")),
+         Scale = factor(Scale, levels = c("1km cells", "250m cells")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Lower_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
@@ -104,6 +107,7 @@ p_Lower_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   labs(x=NULL, y=expression("Area ("*km^2*")"), fill=NULL) +
   scale_fill_manual(values = c("#D55E00", "#009E73")) +
   guides(fill = F) +
+  scale_y_continuous(limits = c(0, 1900)) +
   theme(axis.text.x = element_text(angle = 10))
 
 # Assemble panels #
