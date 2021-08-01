@@ -5,7 +5,7 @@ theme_set(theme_cowplot())
 setwd("C:/Users/Quresh.Latif/files/projects/CEAP_map_tool")
 load("Data_compiled.RData")
 
-dat <- read.csv("Map_summaries_area.csv", header = T, stringsAsFactors = F) %>%
+dat <- read.csv("Map_summaries_prparea.csv", header = T, stringsAsFactors = F) %>%
   rename(Class = X) %>%
   mutate(Zone = str_sub(Class, -7, -1)) %>%
   mutate(MetricScale = str_sub(Class, 1, -9)) %>%
@@ -32,9 +32,10 @@ dat.plot <- dat %>% filter(Zone == "UppMont") %>%
 p_Upper_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
   facet_grid(. ~ Scale) +
-  labs(x=NULL, y=expression("Area ("*km^2*")"), fill=NULL) +
+  labs(x=NULL, y=NULL, fill=NULL) +
   scale_fill_manual(values = c("#D55E00", "#009E73")) +
-  scale_y_continuous(limits = c(0, 3200)) +
+  scale_y_continuous(limits = c(0, 1)) +
+  guides(fill=guide_legend(reverse=TRUE)) +
   theme(legend.position = c(1,1), legend.justification = c(1,1),
         axis.text.x = element_text(angle = 10))
 
@@ -56,10 +57,10 @@ dat.plot <- dat %>% filter(Zone == "UppMont") %>%
 p_Upper_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
   facet_grid(. ~ Scale) +
-  labs(x=NULL, y=expression("Area ("*km^2*")"), fill=NULL) +
+  labs(x=NULL, y=NULL, fill=NULL) +
   scale_fill_manual(values = c("#D55E00", "#009E73")) +
   guides(fill = F) +
-  scale_y_continuous(limits = c(0, 3200)) +
+  scale_y_continuous(limits = c(0, 1)) +
   theme(axis.text.x = element_text(angle = 10))
 
 # Lower montane, fuels reduction
@@ -68,7 +69,7 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
   mutate(Direction = "Gains") %>%
   rename(Area = FHR_Gain) %>%
   bind_rows(
-    dat %>% filter(Zone == "UppMont") %>%
+    dat %>% filter(Zone == "LowMont") %>%
       select(Metric, Scale, FHR_Loss) %>%
       mutate(Direction = "Losses") %>%
       rename(Area = FHR_Loss)
@@ -80,10 +81,10 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
 p_Lower_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
   facet_grid(. ~ Scale) +
-  labs(x=NULL, y=expression("Area ("*km^2*")"), fill=NULL) +
+  labs(x=NULL, y=NULL, fill=NULL) +
   scale_fill_manual(values = c("#D55E00", "#009E73")) +
   guides(fill = F) +
-  scale_y_continuous(limits = c(0, 1900)) +
+  scale_y_continuous(limits = c(0, 1)) +
   theme(axis.text.x = element_text(angle = 10))
 
 # Lower montane, restoration
@@ -92,7 +93,7 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
   mutate(Direction = "Gains") %>%
   rename(Area = RES_Gain) %>%
   bind_rows(
-    dat %>% filter(Zone == "UppMont") %>%
+    dat %>% filter(Zone == "LowMont") %>%
       select(Metric, Scale, RES_Loss) %>%
       mutate(Direction = "Losses") %>%
       rename(Area = RES_Loss)
@@ -104,10 +105,10 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
 p_Lower_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
   facet_grid(. ~ Scale) +
-  labs(x=NULL, y=expression("Area ("*km^2*")"), fill=NULL) +
+  labs(x=NULL, y=NULL, fill=NULL) +
   scale_fill_manual(values = c("#D55E00", "#009E73")) +
   guides(fill = F) +
-  scale_y_continuous(limits = c(0, 1900)) +
+  scale_y_continuous(limits = c(0, 1)) +
   theme(axis.text.x = element_text(angle = 10))
 
 # Assemble panels #

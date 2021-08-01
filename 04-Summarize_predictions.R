@@ -228,6 +228,88 @@ out[c("SRPoint_UppMont", "SpecPoint_UppMont", "RatPoint_UppMont"), "RES_Loss"] <
 
 write.csv(out, "Map_summaries_area.csv")
 
+## Proportion area with supported gains or losses ##
+cols <- c("FHR_Gain", "FHR_Loss", "RES_Gain", "RES_Loss")
+rows <- c("SRGrid_LowMont", "SRPoint_LowMont", "SRGrid_UppMont", "SRPoint_UppMont",
+          "SpecGrid_LowMont", "SpecPoint_LowMont", "SpecGrid_UppMont", "SpecPoint_UppMont",
+          "RatGrid_LowMont", "RatPoint_LowMont", "RatGrid_UppMont", "RatPoint_UppMont")
+out <- matrix(NA, nrow = length(rows), ncol = length(cols),
+              dimnames = list(rows, cols))
+
+max.extent <- sum(dat_grid$LowMont == 1)
+out[c("SRGrid_LowMont", "SpecGrid_LowMont", "RatGrid_LowMont"), "FHR_Gain"] <- dat_grid %>%
+  filter(LowMont == 1) %>% select(DSR_FHRp, DSp_FHRp, DRt_FHRp) %>%
+  summarise_all(function(x) sum(x >= 0.975)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRGrid_LowMont", "SpecGrid_LowMont", "RatGrid_LowMont"), "FHR_Loss"] <- dat_grid %>%
+  filter(LowMont == 1) %>% select(DSR_FHRp, DSp_FHRp, DRt_FHRp) %>%
+  summarise_all(function(x) sum(x <= 0.025)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRGrid_LowMont", "SpecGrid_LowMont", "RatGrid_LowMont"), "RES_Gain"] <- dat_grid %>%
+  filter(LowMont == 1) %>% select(DSR_RESp, DSp_RESp, DRt_RESp) %>%
+  summarise_all(function(x) sum(x >= 0.975)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRGrid_LowMont", "SpecGrid_LowMont", "RatGrid_LowMont"), "RES_Loss"] <- dat_grid %>%
+  filter(LowMont == 1) %>% select(DSR_RESp, DSp_RESp, DRt_RESp) %>%
+  summarise_all(function(x) sum(x <= 0.025)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+
+max.extent <- sum(dat_point$LowMont == 1)
+out[c("SRPoint_LowMont", "SpecPoint_LowMont", "RatPoint_LowMont"), "FHR_Gain"] <- dat_point %>%
+  filter(LowMont == 1) %>% select(DSR_FHRp, DSp_FHRp, DRt_FHRp) %>%
+  summarise_all(function(x) sum(x >= 0.975)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRPoint_LowMont", "SpecPoint_LowMont", "RatPoint_LowMont"), "FHR_Loss"] <- dat_point %>%
+  filter(LowMont == 1) %>% select(DSR_FHRp, DSp_FHRp, DRt_FHRp) %>%
+  summarise_all(function(x) sum(x <= 0.025)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRPoint_LowMont", "SpecPoint_LowMont", "RatPoint_LowMont"), "RES_Gain"] <- dat_point %>%
+  filter(LowMont == 1) %>% select(DSR_RESp, DSp_RESp, DRt_RESp) %>%
+  summarise_all(function(x) sum(x >= 0.975)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRPoint_LowMont", "SpecPoint_LowMont", "RatPoint_LowMont"), "RES_Loss"] <- dat_point %>%
+  filter(LowMont == 1) %>% select(DSR_RESp, DSp_RESp, DRt_RESp) %>%
+  summarise_all(function(x) sum(x <= 0.025)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+
+max.extent <- sum(dat_grid$LowMont == 0)
+out[c("SRGrid_UppMont", "SpecGrid_UppMont", "RatGrid_UppMont"), "FHR_Gain"] <- dat_grid %>%
+  filter(LowMont == 0) %>% select(DSR_FHRp, DSp_FHRp, DRt_FHRp) %>%
+  summarise_all(function(x) sum(x >= 0.975)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRGrid_UppMont", "SpecGrid_UppMont", "RatGrid_UppMont"), "FHR_Loss"] <- dat_grid %>%
+  filter(LowMont == 0) %>% select(DSR_FHRp, DSp_FHRp, DRt_FHRp) %>%
+  summarise_all(function(x) sum(x <= 0.025)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRGrid_UppMont", "SpecGrid_UppMont", "RatGrid_UppMont"), "RES_Gain"] <- dat_grid %>%
+  filter(LowMont == 0) %>% select(DSR_RESp, DSp_RESp, DRt_RESp) %>%
+  summarise_all(function(x) sum(x >= 0.975)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRGrid_UppMont", "SpecGrid_UppMont", "RatGrid_UppMont"), "RES_Loss"] <- dat_grid %>%
+  filter(LowMont == 0) %>% select(DSR_RESp, DSp_RESp, DRt_RESp) %>%
+  summarise_all(function(x) sum(x <= 0.025)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+
+max.extent <- sum(dat_point$LowMont == 0)
+out[c("SRPoint_UppMont", "SpecPoint_UppMont", "RatPoint_UppMont"), "FHR_Gain"] <- dat_point %>%
+  filter(LowMont == 0) %>% select(DSR_FHRp, DSp_FHRp, DRt_FHRp) %>%
+  summarise_all(function(x) sum(x >= 0.975)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRPoint_UppMont", "SpecPoint_UppMont", "RatPoint_UppMont"), "FHR_Loss"] <- dat_point %>%
+  filter(LowMont == 0) %>% select(DSR_FHRp, DSp_FHRp, DRt_FHRp) %>%
+  summarise_all(function(x) sum(x <= 0.025)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRPoint_UppMont", "SpecPoint_UppMont", "RatPoint_UppMont"), "RES_Gain"] <- dat_point %>%
+  filter(LowMont == 0) %>% select(DSR_RESp, DSp_RESp, DRt_RESp) %>%
+  summarise_all(function(x) sum(x >= 0.975)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+out[c("SRPoint_UppMont", "SpecPoint_UppMont", "RatPoint_UppMont"), "RES_Loss"] <- dat_point %>%
+  filter(LowMont == 0) %>% select(DSR_RESp, DSp_RESp, DRt_RESp) %>%
+  summarise_all(function(x) sum(x <= 0.025)) %>% data.matrix() %>% as.numeric() %>%
+  (function(x) x / max.extent)
+
+write.csv(out, "Map_summaries_prparea.csv")
+
 ## Relate with heterogeneity ##
 dat_catch <- read.csv("C:/Users/Quresh.Latif/files/GIS/CEAP/PredictGrid/heterogeneity_metrics.csv", header = T, stringsAsFactors = F) %>%
   select(FEATURE, H, RC2, TRT)

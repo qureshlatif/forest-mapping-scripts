@@ -15,6 +15,9 @@ mod <- loadObject(mod.nam)
 # Compile data to get covariate names #
 source(str_c(scripts.loc, "Data_processing_community_occupancy.R"))
 
+spp.specialist <- read.csv("Spp_list_detected_&_categorized.csv", header = T, stringsAsFactors = F) %>%
+  filter(PIPO_specialist) %>% pull(BirdCode) # Get list of PIPO specialists
+
 # Tabulate parameter estimates
 pars <- c(str_c("beta.", dimnames(X.beta)[[3]]),
           str_c("alpha.", dimnames(X.alpha)[[2]]),
@@ -58,6 +61,9 @@ dat.plt <- tbl_pars %>% as_tibble() %>%
   select(beta.PACC10:beta.mnPerArRatio_Opn.hi, alpha.CanCov:alpha.CanCov2.hi) %>%
   mutate(Spp = spp.list[which(spp.detected)]) %>%
   mutate(index = row_number() %>% rev())
+
+dat.plt <- dat.plt %>% # Flag specialists with asterisk
+  mutate(Spp = ifelse(Spp %in% spp.specialist, str_c(Spp, "*"), Spp))
 
 dat.plt.supp <- dat.plt %>%
   filter_at(vars(ends_with(".lo")), any_vars(. > 0)) %>%
@@ -153,4 +159,4 @@ p <- ggdraw() +
   draw_plot(p.CanCov2, x = 0.7625, y = 0, width = 0.2375, height = 1) +
   draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0)
 
-save_plot("Plot_effects.jpg", p, ncol = 4, nrow = 3.5, dpi = 200)
+save_plot("Plot_effects.jpg", p, ncol = 3, nrow = 3.5, dpi = 200)
