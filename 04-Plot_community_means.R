@@ -80,24 +80,38 @@ dat_point_long <- dat_point %>%
   mutate(LifeZone = factor(LifeZone, levels = c("Lower montane", "Upper montane")),
          Scenario = factor(Scenario, levels = c("Baseline", "Fuels reduction", "Restoration")))
 
+## Define functions for customizing boxplot ##
+f <- function(x) {
+  r <- quantile(x, probs = c(0.05, 0.25, 0.5, 0.75, 0.95), type = 8)
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  r
+}
+
+o <- function(x) {
+  subset(x, x < quantile(x, prob = 0.05, type = 8) | quantile(x, prob = 0.95, type = 8) < x)
+}
+
 ## Generate box plots ##
 p.SR.grid <- ggplot(dat_grid_long, aes(x = Scenario, y = SR)) +
   facet_grid(. ~ LifeZone) +
-  geom_boxplot() +
+  stat_summary(fun.data = f, geom="boxplot") +
+  stat_summary(fun = o, geom="point", alpha = 0.3, size = 0.2, positiion = "jitter") +
   ylab("Species richness") +
   xlab(NULL) +
   theme(axis.text.x = element_text(angle = 10))
 
 p.Spec.grid <- ggplot(dat_grid_long, aes(x = Scenario, y = Spec)) +
   facet_grid(. ~ LifeZone) +
-  geom_boxplot() +
+  stat_summary(fun.data = f, geom="boxplot") +
+  stat_summary(fun = o, geom="point", alpha = 0.3, size = 0.2) +
   ylab("Specialist richness") +
   xlab(NULL) +
   theme(axis.text.x = element_text(angle = 10))
 
 p.Rat.grid <- ggplot(dat_grid_long, aes(x = Scenario, y = Rat)) +
   facet_grid(. ~ LifeZone) +
-  geom_boxplot() +
+  stat_summary(fun.data = f, geom="boxplot") +
+  stat_summary(fun = o, geom="point", alpha = 0.3, size = 0.2) +
   ylab("Specialist-generalist ratio") +
   xlab(NULL) +
   theme(axis.text.x = element_text(angle = 10))
@@ -105,21 +119,24 @@ p.Rat.grid <- ggplot(dat_grid_long, aes(x = Scenario, y = Rat)) +
 
 p.SR.point <- ggplot(dat_point_long, aes(x = Scenario, y = SR)) +
   facet_grid(. ~ LifeZone) +
-  geom_boxplot() +
+  stat_summary(fun.data = f, geom="boxplot") +
+  stat_summary(fun = o, geom="point", alpha = 0.3, size = 0.2) +
   ylab("Species richness") +
   xlab(NULL) +
   theme(axis.text.x = element_text(angle = 10))
 
 p.Spec.point <- ggplot(dat_point_long, aes(x = Scenario, y = Spec)) +
   facet_grid(. ~ LifeZone) +
-  geom_boxplot() +
+  stat_summary(fun.data = f, geom="boxplot") +
+  stat_summary(fun = o, geom="point", alpha = 0.3, size = 0.2) +
   ylab("Specialist richness") +
   xlab(NULL) +
   theme(axis.text.x = element_text(angle = 10))
 
 p.Rat.point <- ggplot(dat_point_long, aes(x = Scenario, y = Rat)) +
   facet_grid(. ~ LifeZone) +
-  geom_boxplot() +
+  stat_summary(fun.data = f, geom="boxplot") +
+  stat_summary(fun = o, geom="point", alpha = 0.3, size = 0.2) +
   ylab("Specialist-generalist ratio") +
   xlab(NULL) +
   theme(axis.text.x = element_text(angle = 10))
@@ -135,7 +152,7 @@ p <- ggdraw() +
   draw_plot(p.Rat.point,  x = 0.5, y = 0,      width = 0.5, height = 0.3333)
 p <- ggdraw() +
   draw_plot(p, x = 0, y = 0, width = 1, height = 0.95) +
-  draw_plot_label(c("Grid scale (1km cells)", "Point scale (250m cells)"),
+  draw_plot_label(c("Grid scale (100 ha)", "Point scale (6.25 ha)"),
                   x = c(0.3, 0.78),
                   y = c(1, 1), size = 20,
                   angle = c(0, 0),

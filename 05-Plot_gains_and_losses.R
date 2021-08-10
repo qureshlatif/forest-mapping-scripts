@@ -11,7 +11,7 @@ dat <- read.csv("Map_summaries_prparea.csv", header = T, stringsAsFactors = F) %
   mutate(MetricScale = str_sub(Class, 1, -9)) %>%
   mutate(Metric = ifelse(str_detect(Class, "SR"), "All species",
                          ifelse(str_detect(Class, "Spec"), "Specialists", "S-G ratio"))) %>%
-  mutate(Scale = ifelse(str_detect(Class, "Grid"), "1km cells", "250m cells")) %>%
+  mutate(Scale = ifelse(str_detect(Class, "Grid"), "Grid scale (100 ha)", "Point scale (6.25 ha)")) %>%
   select(Metric, Scale, Zone, FHR_Gain:RES_Loss)
 
 # Upper montane, fuels reduction
@@ -27,7 +27,7 @@ dat.plot <- dat %>% filter(Zone == "UppMont") %>%
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
   mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
-         Scale = factor(Scale, levels = c("1km cells", "250m cells")),
+         Scale = factor(Scale, levels = c("Grid scale (100 ha)", "Point scale (6.25 ha)")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Upper_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
@@ -52,7 +52,7 @@ dat.plot <- dat %>% filter(Zone == "UppMont") %>%
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
   mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
-         Scale = factor(Scale, levels = c("1km cells", "250m cells")),
+         Scale = factor(Scale, levels = c("Grid scale (100 ha)", "Point scale (6.25 ha)")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Upper_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
@@ -76,7 +76,7 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
   mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
-         Scale = factor(Scale, levels = c("1km cells", "250m cells")),
+         Scale = factor(Scale, levels = c("Grid scale (100 ha)", "Point scale (6.25 ha)")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Lower_FHR <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
@@ -100,7 +100,7 @@ dat.plot <- dat %>% filter(Zone == "LowMont") %>%
   ) %>%
   select(Metric, Scale, Direction, Area) %>%
   mutate(Metric = factor(Metric, levels = c("All species", "Specialists", "S-G ratio")),
-         Scale = factor(Scale, levels = c("1km cells", "250m cells")),
+         Scale = factor(Scale, levels = c("Grid scale (100 ha)", "Point scale (6.25 ha)")),
          Direction = factor(Direction, levels = c("Losses", "Gains")))
 p_Lower_RES <- ggplot(dat.plot, aes(x = Metric, y = Area, fill = Direction)) +
   geom_bar(stat = "identity") +
@@ -118,12 +118,15 @@ p <- ggdraw() +
   draw_plot(p_Lower_FHR, x = 0,   y = 0,   width = 0.5, height = 0.5) +
   draw_plot(p_Lower_RES, x = 0.5, y = 0,   width = 0.5, height = 0.5)
 p <- ggdraw() +
-  draw_plot(p, x = 0.05, y = 0, width = 0.95, height = 0.95) +
+  draw_plot(p, x = 0.07, y = 0, width = 0.93, height = 0.95) +
   draw_plot_label(c("Fuels reduction", "Restoration",
+                    "Proportion landscape",
                     "Lower Montane", "Upper Montane"),
-                  x = c(0.35, 0.8, 0, 0),
-                  y = c(1, 1, 0.25, 0.72), size = 20,
-                  angle = c(0, 0, 90, 90),
-                  hjust = c(0.5, 0.5, 0.5, 0.5))
+                  x = c(0.32, 0.79, 0.02, 0, 0),
+                  y = c(1, 1, 0.5, 0.1, 0.9),
+                  size = c(20, 20, 23, 20, 20),
+                  angle = c(0, 0, 90, 90, 90),
+                  hjust = c(0.5, 0.5, 0.5, 0, 1),
+                  fontface = c("bold", "bold", "italic", "bold", "bold"))
 
 save_plot("Plot_gains_losses.jpg", p, ncol = 2, nrow = 3, dpi = 200)
