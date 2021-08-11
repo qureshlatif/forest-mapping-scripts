@@ -334,102 +334,105 @@ dat_catch <- dat_catch %>% filter(TRT == "UNT") %>% select(-TRT) %>%
 #hist(dat_catch$RC2_FHRd)
 #hist(dat_catch$RC2_RESd)
 
-dat_point_sum <- dat_point %>% left_join(
-  foreign::read.dbf("C:/Users/Quresh.Latif/files/GIS/CEAP/PredictGrid/CEAPpts_pred.dbf", as.is = T) %>%
-    select(Id, CatchID),
-  by = "Id"
-  ) %>%
-  left_join(dat_catch, by = c("CatchID" = "FEATURE")) %>%
-  dplyr::group_by(CatchID) %>%
-  summarise(SR_FHR = mean(SR_FHR),
-            SR_RES = mean(SR_RES),
-            DSR_FHR = mean(SR_FHR - SR0),
-            DSR_RES = mean(SR_RES - SR0),
-            H_FHR = mean(H_FHR),
-            H_RES = mean(H_RES),
-            H_FHRd = mean(H_FHRd),
-            H_RESd = mean(H_RESd),
-            RC2_FHR = mean(RC2_FHR),
-            RC2_RES = mean(RC2_RES),
-            RC2_FHRd = mean(RC2_FHRd),
-            RC2_RESd = mean(RC2_RESd),
-            LowMont = first(LowMont))
 
-cor(dat_point_sum$H_FHR[which(dat_point_sum$LowMont == 1)], dat_point_sum$SR_FHR[which(dat_point_sum$LowMont == 1)])
-cor(dat_point_sum$H_FHR[which(dat_point_sum$LowMont == 0)], dat_point_sum$SR_FHR[which(dat_point_sum$LowMont == 0)])
+##*** Need to rejoin catchment IDs with point files containing predictions if we want this again ***##
 
-cor(dat_point_sum$H_RES[which(dat_point_sum$LowMont == 1)], dat_point_sum$SR_RES[which(dat_point_sum$LowMont == 1)])
-cor(dat_point_sum$H_RES[which(dat_point_sum$LowMont == 0)], dat_point_sum$SR_RES[which(dat_point_sum$LowMont == 0)])
-
-cor(dat_point_sum$H_FHRd[which(dat_point_sum$LowMont == 1)], dat_point_sum$DSR_FHR[which(dat_point_sum$LowMont == 1)])
-cor(dat_point_sum$H_FHRd[which(dat_point_sum$LowMont == 0)], dat_point_sum$DSR_FHR[which(dat_point_sum$LowMont == 0)])
-
-cor(dat_point_sum$H_RESd[which(dat_point_sum$LowMont == 1)], dat_point_sum$DSR_RES[which(dat_point_sum$LowMont == 1)])
-cor(dat_point_sum$H_RESd[which(dat_point_sum$LowMont == 0)], dat_point_sum$DSR_RES[which(dat_point_sum$LowMont == 0)])
-
-dat_grid_sum <- dat_grid %>% left_join(
-  foreign::read.dbf("C:/Users/Quresh.Latif/files/GIS/CEAP/PredictGrid/CEAPgrid_pred.dbf", as.is = T) %>%
-    select(USNG_Code, CatchID),
-  by = "USNG_Code"
-) %>%
-  left_join(dat_catch, by = c("CatchID" = "FEATURE")) %>%
-  dplyr::group_by(CatchID) %>%
-  summarise(SR_FHR = mean(SR_FHR),
-            SR_RES = mean(SR_RES),
-            DSR_FHR = mean(SR_FHR - SR0),
-            DSR_RES = mean(SR_RES - SR0),
-            H_FHR = mean(H_FHR),
-            H_RES = mean(H_RES),
-            H_FHRd = mean(H_FHRd),
-            H_RESd = mean(H_RESd),
-            RC2_FHR = mean(RC2_FHR),
-            RC2_RES = mean(RC2_RES),
-            RC2_FHRd = mean(RC2_FHRd),
-            RC2_RESd = mean(RC2_RESd),
-            LowMont = first(LowMont))
-
-cor(dat_grid_sum$H_FHR[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$SR_FHR[which(dat_grid_sum$LowMont == 1)], use = "complete")
-cor(dat_grid_sum$H_FHR[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$SR_FHR[which(dat_grid_sum$LowMont == 0)], use = "complete")
-
-cor(dat_grid_sum$H_RES[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$SR_RES[which(dat_grid_sum$LowMont == 1)], use = "complete")
-cor(dat_grid_sum$H_RES[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$SR_RES[which(dat_grid_sum$LowMont == 0)], use = "complete")
-
-cor(dat_grid_sum$H_FHRd[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$DSR_FHR[which(dat_grid_sum$LowMont == 1)], use = "complete")
-cor(dat_grid_sum$H_FHRd[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$DSR_FHR[which(dat_grid_sum$LowMont == 0)], use = "complete")
-
-# At grid cell level, positive relationship between change in heterogeneity and change in species richness under restoration scenario
-cor(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$DSR_RES[which(dat_grid_sum$LowMont == 1)], use = "complete")
-plot(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$DSR_RES[which(dat_grid_sum$LowMont == 1)])
-cor(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$DSR_RES[which(dat_grid_sum$LowMont == 0)], use = "complete")
-plot(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$DSR_RES[which(dat_grid_sum$LowMont == 0)])
-
-# I suspect with restoration, heterogeneity is positively related with treatment intensity, whereas with fuels reduction the opposite is true.
-# This is probably why you have opposite relationships between change in hetergeneity and change in species richness with FHR (negative) vs RES (positive).
-
-## Summarize and tabulate heterogeneity ##
-dat_catch <- dat_catch %>%
-  left_join(
-    dat_point_sum %>% select(CatchID, LowMont) %>%
-      distinct(),
-    by = c("FEATURE" = "CatchID")
-  )
-
-cols <- c("Ref", "FHR", "FHR_Diff", "RES", "RES_Diff")
-rows <- c("H_LowM", "RC2_LowM", "H_UppM", "RC2_UppM")
-out <- matrix("", nrow = length(rows), ncol = length(cols),
-              dimnames = list(rows, cols))
-
-out["H_LowM", ] <- dat_catch %>% filter(LowMont == 1) %>%
-  select(H_UNT, H_FHR, H_FHRd, H_RES, H_RESd) %>%
-  summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
-out["H_UppM", ] <- dat_catch %>% filter(LowMont == 0) %>%
-  select(H_UNT, H_FHR, H_FHRd, H_RES, H_RESd) %>%
-  summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
-out["RC2_LowM", ] <- dat_catch %>% filter(LowMont == 1) %>%
-  select(RC2_UNT, RC2_FHR, RC2_FHRd, RC2_RES, RC2_RESd) %>%
-  summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
-out["RC2_UppM", ] <- dat_catch %>% filter(LowMont == 0) %>%
-  select(RC2_UNT, RC2_FHR, RC2_FHRd, RC2_RES, RC2_RESd) %>%
-  summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
-
-write.csv(out, "Heterogeneity_summaries.csv")
+# dat_point_sum <- dat_point %>% left_join(
+#   foreign::read.dbf("C:/Users/Quresh.Latif/files/GIS/CEAP/PredictGrid/CEAPpts_pred.dbf", as.is = T) %>%
+#     select(Id, CatchID),
+#   by = "Id"
+#   ) %>%
+#   left_join(dat_catch, by = c("CatchID" = "FEATURE")) %>%
+#   dplyr::group_by(CatchID) %>%
+#   summarise(SR_FHR = mean(SR_FHR),
+#             SR_RES = mean(SR_RES),
+#             DSR_FHR = mean(SR_FHR - SR0),
+#             DSR_RES = mean(SR_RES - SR0),
+#             H_FHR = mean(H_FHR),
+#             H_RES = mean(H_RES),
+#             H_FHRd = mean(H_FHRd),
+#             H_RESd = mean(H_RESd),
+#             RC2_FHR = mean(RC2_FHR),
+#             RC2_RES = mean(RC2_RES),
+#             RC2_FHRd = mean(RC2_FHRd),
+#             RC2_RESd = mean(RC2_RESd),
+#             LowMont = first(LowMont))
+# 
+# cor(dat_point_sum$H_FHR[which(dat_point_sum$LowMont == 1)], dat_point_sum$SR_FHR[which(dat_point_sum$LowMont == 1)])
+# cor(dat_point_sum$H_FHR[which(dat_point_sum$LowMont == 0)], dat_point_sum$SR_FHR[which(dat_point_sum$LowMont == 0)])
+# 
+# cor(dat_point_sum$H_RES[which(dat_point_sum$LowMont == 1)], dat_point_sum$SR_RES[which(dat_point_sum$LowMont == 1)])
+# cor(dat_point_sum$H_RES[which(dat_point_sum$LowMont == 0)], dat_point_sum$SR_RES[which(dat_point_sum$LowMont == 0)])
+# 
+# cor(dat_point_sum$H_FHRd[which(dat_point_sum$LowMont == 1)], dat_point_sum$DSR_FHR[which(dat_point_sum$LowMont == 1)])
+# cor(dat_point_sum$H_FHRd[which(dat_point_sum$LowMont == 0)], dat_point_sum$DSR_FHR[which(dat_point_sum$LowMont == 0)])
+# 
+# cor(dat_point_sum$H_RESd[which(dat_point_sum$LowMont == 1)], dat_point_sum$DSR_RES[which(dat_point_sum$LowMont == 1)])
+# cor(dat_point_sum$H_RESd[which(dat_point_sum$LowMont == 0)], dat_point_sum$DSR_RES[which(dat_point_sum$LowMont == 0)])
+# 
+# dat_grid_sum <- dat_grid %>% left_join(
+#   foreign::read.dbf("C:/Users/Quresh.Latif/files/GIS/CEAP/PredictGrid/CEAPgrid_pred.dbf", as.is = T) %>%
+#     select(USNG_Code, CatchID),
+#   by = "USNG_Code"
+# ) %>%
+#   left_join(dat_catch, by = c("CatchID" = "FEATURE")) %>%
+#   dplyr::group_by(CatchID) %>%
+#   summarise(SR_FHR = mean(SR_FHR),
+#             SR_RES = mean(SR_RES),
+#             DSR_FHR = mean(SR_FHR - SR0),
+#             DSR_RES = mean(SR_RES - SR0),
+#             H_FHR = mean(H_FHR),
+#             H_RES = mean(H_RES),
+#             H_FHRd = mean(H_FHRd),
+#             H_RESd = mean(H_RESd),
+#             RC2_FHR = mean(RC2_FHR),
+#             RC2_RES = mean(RC2_RES),
+#             RC2_FHRd = mean(RC2_FHRd),
+#             RC2_RESd = mean(RC2_RESd),
+#             LowMont = first(LowMont))
+# 
+# cor(dat_grid_sum$H_FHR[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$SR_FHR[which(dat_grid_sum$LowMont == 1)], use = "complete")
+# cor(dat_grid_sum$H_FHR[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$SR_FHR[which(dat_grid_sum$LowMont == 0)], use = "complete")
+# 
+# cor(dat_grid_sum$H_RES[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$SR_RES[which(dat_grid_sum$LowMont == 1)], use = "complete")
+# cor(dat_grid_sum$H_RES[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$SR_RES[which(dat_grid_sum$LowMont == 0)], use = "complete")
+# 
+# cor(dat_grid_sum$H_FHRd[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$DSR_FHR[which(dat_grid_sum$LowMont == 1)], use = "complete")
+# cor(dat_grid_sum$H_FHRd[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$DSR_FHR[which(dat_grid_sum$LowMont == 0)], use = "complete")
+# 
+# # At grid cell level, positive relationship between change in heterogeneity and change in species richness under restoration scenario
+# cor(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$DSR_RES[which(dat_grid_sum$LowMont == 1)], use = "complete")
+# plot(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 1)], dat_grid_sum$DSR_RES[which(dat_grid_sum$LowMont == 1)])
+# cor(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$DSR_RES[which(dat_grid_sum$LowMont == 0)], use = "complete")
+# plot(dat_grid_sum$H_RESd[which(dat_grid_sum$LowMont == 0)], dat_grid_sum$DSR_RES[which(dat_grid_sum$LowMont == 0)])
+# 
+# # I suspect with restoration, heterogeneity is positively related with treatment intensity, whereas with fuels reduction the opposite is true.
+# # This is probably why you have opposite relationships between change in hetergeneity and change in species richness with FHR (negative) vs RES (positive).
+# 
+# ## Summarize and tabulate heterogeneity ##
+# dat_catch <- dat_catch %>%
+#   left_join(
+#     dat_point_sum %>% select(CatchID, LowMont) %>%
+#       distinct(),
+#     by = c("FEATURE" = "CatchID")
+#   )
+# 
+# cols <- c("Ref", "FHR", "FHR_Diff", "RES", "RES_Diff")
+# rows <- c("H_LowM", "RC2_LowM", "H_UppM", "RC2_UppM")
+# out <- matrix("", nrow = length(rows), ncol = length(cols),
+#               dimnames = list(rows, cols))
+# 
+# out["H_LowM", ] <- dat_catch %>% filter(LowMont == 1) %>%
+#   select(H_UNT, H_FHR, H_FHRd, H_RES, H_RESd) %>%
+#   summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
+# out["H_UppM", ] <- dat_catch %>% filter(LowMont == 0) %>%
+#   select(H_UNT, H_FHR, H_FHRd, H_RES, H_RESd) %>%
+#   summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
+# out["RC2_LowM", ] <- dat_catch %>% filter(LowMont == 1) %>%
+#   select(RC2_UNT, RC2_FHR, RC2_FHRd, RC2_RES, RC2_RESd) %>%
+#   summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
+# out["RC2_UppM", ] <- dat_catch %>% filter(LowMont == 0) %>%
+#   select(RC2_UNT, RC2_FHR, RC2_FHRd, RC2_RES, RC2_RESd) %>%
+#   summarise_all(sum.fn, dig = 2) %>% as.matrix() %>% as.character()
+# 
+# write.csv(out, "Heterogeneity_summaries.csv")

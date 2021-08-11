@@ -7,7 +7,7 @@ setwd("C:/Users/Quresh.Latif/files/projects/CEAP_map_tool")
 ################## Inputs ####################
 # Get latest AOU checklist with tax names and order #
 aou.checklist <- read.csv("C:/Users/Quresh.Latif/files/data/NACC_list_bird_species_downloaded_20200416.csv",
-                          header = T, stringsAsFactors = F) %>% tbl_df %>%
+                          header = T, stringsAsFactors = F) %>% as_tibble() %>%
   mutate(tax_ord = row_number())
 
 spp.exclude <- c("Squirrel, Red", "Ruffed Grouse", "Turkey Vulture", "Wild Turkey",

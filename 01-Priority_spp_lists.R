@@ -102,18 +102,25 @@ Spp_list <- Spp_list %>%
 #'   distinct() %>% nrow
 #' 
 #' dat_sum <- dat %>% # Calculate relative abundance by species within PIPO forest, everything except PIPO forest, and overall.
-#'   filter(primaryHabitat == "PP") %>%
-#'   dplyr::group_by(BirdCode) %>%
-#'   summarise(RA_pp = sum(CL_count) / nPIPO) %>% # PIPO forest
-#'   left_join(dat %>%
-#'               filter(primaryHabitat != "PP") %>%
-#'               dplyr::group_by(BirdCode) %>%
-#'               summarise(RA_nonpp = sum(CL_count) / nNonPIPO), # non-PIPO forest
-#'             by = "BirdCode") %>% # non-PIPO forest
+#'   select(BirdCode) %>% distinct() %>%
+#'   left_join(
+#'     dat %>%
+#'       filter(primaryHabitat == "PP") %>%
+#'       dplyr::group_by(BirdCode) %>%
+#'       summarise(RA_pp = sum(CL_count) / nPIPO), # PIPO forest
+#'     by = "BirdCode"
+#'   ) %>%
+#'   left_join(
+#'     dat %>%
+#'       filter(primaryHabitat != "PP") %>%
+#'       dplyr::group_by(BirdCode) %>%
+#'       summarise(RA_nonpp = sum(CL_count) / nNonPIPO), # non-PIPO forest
+#'     by = "BirdCode") %>% # non-PIPO forest
+#'   mutate(RA_pp = ifelse(is.na(RA_pp), 0, RA_pp),
+#'          RA_nonpp = ifelse(is.na(RA_nonpp), 0, RA_nonpp)) %>%
 #'   mutate(PSI = RA_pp / (RA_nonpp + RA_pp))
 #' 
 #' write.csv(dat_sum, "PIPO_associate_spp_cache.csv", row.names = F)
-
 
 #sum(dat_sum$PSI > 0.5) # Number of species with specialization index > 0.5
 #dat_sum$BirdCode[which(dat_sum$PSI > 0.5)] # Specialized species
@@ -122,7 +129,6 @@ Spp_list <- Spp_list %>%
 dat_sum <- read.csv("PIPO_associate_spp_cache.csv", stringsAsFactors = F) %>% as_tibble()
 Spp_list <- Spp_list %>%
   mutate(PIPO_associated = BirdCode %in% dat_sum$BirdCode[which(dat_sum$PSI > 0.5)],
-         PIPO_specialist = BirdCode %in% dat_sum$BirdCode[which(dat_sum$PSI > 0.66)]) %>%
-  filter(Detections > 0)
+         PIPO_specialist = BirdCode %in% dat_sum$BirdCode[which(dat_sum$PSI > 0.66)])
 
 write.csv(Spp_list, "Spp_list_detected_&_categorized.csv", row.names = F)

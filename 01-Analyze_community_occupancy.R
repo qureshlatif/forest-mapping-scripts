@@ -88,7 +88,7 @@ mod.raw <- combineSaves(rsav, burnFiles = 20, thin = 10)
 mod <- mcmcOutput(mod.raw)
 sumTab <- summary(mod, MCEpc = F, n.eff = T, f = T, overlap0 = T, verbose = F)
 sumTab <- sumTab %>%
-  tbl_df() %>%
+  as_tibble() %>%
   mutate(Parameter = row.names(sumTab)) %>%
   select(Parameter, mean:f)
 mod <- list(mcmcOutput = mod, sims.list = simsList(mod.raw), summary = sumTab)
