@@ -176,7 +176,7 @@ bird_data <- grab %>%  # Store bird survey data for later use.
 
 ## Get GIS covariates ##
 dat.gis <- foreign::read.dbf("C:/Users/Quresh.Latif/files/GIS/FS/CFLRP/Bird_survey_point_coords.dbf", as.is = T) %>%
-  tbl_df() %>%
+  tibble::as_tibble() %>%
   rename(Grid = TransectNu) %>%
   select(Grid, Point, Northing, heatload, TWI, LifeZone)
 
@@ -362,3 +362,28 @@ Cov[, -c(1:4)] <- veg_data %>%
 rm(obs, maxDetPossible, sp, ss, tvec, grab)
 save.image("Data_compiled.RData")
 
+#### Check life zone correlation with primary habitat classifications ####
+# BCRDataAPI::reset_api()
+# BCRDataAPI::set_api_server('analysis.api.bcr.eco')
+# BCRDataAPI::add_columns(c('TransectNum|str',
+#                           'Point|int',
+#                           'Year|int',
+#                           'primaryHabitat|str'
+# ))
+# 
+# BCRDataAPI::filter_on(c(str_c('Stratum in ', str_c(strata, collapse = ",")),
+#                         str_c('SelectionMethod in ', str_c(SampDesign, collapse = ",")),
+#                         'Year in 2014,2016,2018'))
+# BCRDataAPI::group_by(c('TransectNum', 'Point', 'Year', 'primaryHabitat'))
+# grab_ph <- BCRDataAPI::get_data() %>%
+#   mutate(PIPO = primaryHabitat == "PP",
+#          MixCon = primaryHabitat == "MC") %>%
+#   dplyr::group_by(TransectNum, Point) %>%
+#   summarise(PIPO1 = sum(PIPO == 1), PIPO0 = sum(PIPO == 0),
+#             MixCon1 = sum(MixCon == 1), MixCon0 = sum(MixCon == 0)) %>%
+#   mutate(PIPO = ifelse(PIPO1 > PIPO0, 1, 0),
+#          MixCon = ifelse(MixCon1 > MixCon0, 1, 0)) %>%
+#   select(TransectNum, Point, PIPO, MixCon)
+# 
+# dat.gis <- dat.gis %>% left_join(grab_ph, by = c("Grid" = "TransectNum", "Point" = "Point"))
+# cor(dat.gis %>% select(PIPO:LowMont), use = "complete")
