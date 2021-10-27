@@ -16,6 +16,7 @@ dat.catch <- read.csv("Catchments_metrics.csv", header=TRUE, stringsAsFactors = 
          LHSPI_RES = LHSPI_R) %>%
   filter(across(D_H_FHR:IFH_RES, function(x) !is.na(x)))
 
+# Complete correlation matrices #
 cor.FHR <- dat.catch %>%
   select(contains("FHR")) %>%
   data.matrix() %>%
@@ -50,3 +51,22 @@ cor.RES.UM <- dat.catch %>%
   data.matrix() %>%
   cor
 
+# Correlations relating avian to non-avian metrics #
+  # Fuels reduction
+dat.avian <- dat.catch %>%
+  select(DSR_FHR_grid, DSR_FHR_pt, DSpec_FHR_grid, DSpec_FHR_pt, DRat_FHR_grid, DRat_FHR_pt) %>%
+  data.matrix()
+dat.nonav <- dat.catch %>%
+  select(D_H_FHR, D_RC2_FHR, D_Sed3_FHR, SF_FHR, LHSPI_FHR, IFH_FHR) %>%
+  data.matrix()
+cor.FHR <- cor(dat.avian, dat.nonav)
+write.csv(cor.FHR, "Catchment_Av-NonAv_correlations_FHR.csv", row.names = T)
+
+dat.avian <- dat.catch %>%
+  select(DSR_Res_grid, DSR_RES_pt, DSpec_Res_grid, DSpec_RES_pt, DRat_Res_grid, DRat_RES_pt) %>%
+  data.matrix()
+dat.nonav <- dat.catch %>%
+  select(D_H_RES, D_RC2_RES, D_Sed3_RES, SF_RES, LHSPI_RES, IFH_RES) %>%
+  data.matrix()
+cor.RES <- cor(dat.avian, dat.nonav)
+write.csv(cor.RES, "Catchment_Av-NonAv_correlations_RES.csv", row.names = T)
