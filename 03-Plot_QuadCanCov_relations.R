@@ -87,4 +87,5 @@ p <- ggdraw() +
                   x = c(0, 0.55), y = c(0.55, 0.05), size = c(28, 28),
                   angle = c(90, 0), hjust = c(0.5, 0.5))
 
-save_plot(str_c("Plot_spp_", x.var, "_relations.jpg"), p, ncol = 2.5, nrow = 3, dpi = 200)
+#save_plot(str_c("Plot_spp_", x.var, "_relations.jpg"), p, ncol = 2.5, nrow = 3, dpi = 200)
+save_plot("manuscript/Figure4.jpg", p, ncol = 2.5, nrow = 3, dpi = 600)

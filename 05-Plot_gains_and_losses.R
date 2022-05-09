@@ -129,4 +129,4 @@ p <- ggdraw() +
                   hjust = c(0.5, 0.5, 0.5, 0, 1),
                   fontface = c("bold", "bold", "italic", "bold", "bold"))
 
-save_plot("Plot_gains_losses.jpg", p, ncol = 2, nrow = 3, dpi = 200)
+save_plot("manuscript/Figure8.jpg", p, ncol = 2, nrow = 3, dpi = 600)

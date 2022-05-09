@@ -264,5 +264,6 @@ p <- ggdraw() +
                   angle = c(90, 90, 90, 0, 0, 0),
                   hjust = c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5))
 
-save_plot("Plot_community_metrics.jpg", p, ncol = 2, nrow = 3, dpi = 200)
+#save_plot("Plot_community_metrics.jpg", p, ncol = 2, nrow = 3, dpi = 200)
+save_plot("manuscript/Figure2.jpg", p, ncol = 2, nrow = 3, dpi = 600)
 

@@ -159,4 +159,5 @@ p <- ggdraw() +
   draw_plot(p.CanCov2, x = 0.7625, y = 0, width = 0.2375, height = 1) +
   draw_plot_label("Species", x = 0, y = 0.5, size = 40, angle = 90, hjust = 0)
 
-save_plot("Plot_effects.jpg", p, ncol = 3, nrow = 3.5, dpi = 200)
+#save_plot("Plot_effects.jpg", p, ncol = 3, nrow = 3.5, dpi = 200)
+save_plot("manuscript/Figure3.jpg", p, ncol = 3, nrow = 3.5, dpi = 600)
